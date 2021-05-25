@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>小人冒险</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				text-align:center;
+			}//中心表示
+		</style>
+		<script type="text/javascript">
+		function playmusic() {
+		var myAuto = document.getElementById('myaudio');
+		myAuto.play();
+		}
+		 //进入全屏并锁定鼠标
+		 function enterFullScreen() {
+			 var de = document.getElementById("gl-canvas");
+			 if (de.requestFullscreen) {
+				 de.requestFullscreen();
+			 } else if (de.mozRequestFullScreen) {
+				 de.mozRequestFullScreen();
+			 } else if (de.webkitRequestFullScreen) {
+				 de.webkitRequestFullScreen();
+			 }
+			 de.requestPointerLock();
+		 }
+		 //退出全屏
+		 function exitFullScreen() {
+			 var de = document;
+			 if (de.exitFullscreen) {
+				 de.exitFullscreen();
+			 } else if (de.mozCancelFullScreen) {
+				 de.mozCancelFullScreen();
+			 } else if (de.webkitCancelFullScreen) {
+				 de.webkitCancelFullScreen();
+			 }
+		 }
+		</script>
+		<style>
+			canvas {margin:0;}
+		</style>
+	</head><!-- 定义标题和编码 -->
+	
+	<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../Common/initShaders.js"></script>
+	<script type="text/javascript" src="../Common/MV.js"></script>
+	<script type="text/javascript" src="last.js"></script>
+	<script type="text/javascript" src="sound.js"></script>
+	<script id="vertex-shader" type="x-shader/x-vertex">
+
+		attribute vec4 vPosition;
+		attribute vec4 vNormal;
+		varying vec3 N, L, E;
+		varying float d;
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+		uniform vec4 lightPosition;
+		uniform mat3 normalMatrix;
+
+		varying float s, t;
+		attribute  vec2 vTexCoord;
+		varying vec2 fTexCoord;
+		void main()
+		{
+			vec3 light;
+			vec3 pos = (modelViewMatrix * vPosition).xyz;
+			if(lightPosition.z == 0.0)  L = normalize(lightPosition.xyz);
+			else  L = normalize(lightPosition).xyz - pos;
+			
+			d=(lightPosition[0]-vPosition[0])*(lightPosition[0]-vPosition[0])+(lightPosition[1]-vPosition[1])*(lightPosition[1]-vPosition[1])+(lightPosition[2]-vPosition[2])*(lightPosition[2]-vPosition[2]);
+			d=d/60.0;
+			
+			E =  -normalize(pos);
+			N = normalize( normalMatrix*vNormal.xyz);
+			gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+			
+			float pi = acos(0.0);
+
+			s= 0.5*acos(vPosition.x)/pi;
+
+			t = 0.5*asin(vPosition.y/sqrt(1.0-vPosition.x*vPosition.x))/pi;
+			
+			fTexCoord = vTexCoord;
+
+		}
+	</script>
+
+	<script id="fragment-shader" type="x-shader/x-fragment">
+
+		precision mediump float;
+
+		uniform vec4 ambientProduct;
+		uniform vec4 diffuseProduct;
+		uniform vec4 specularProduct;
+		uniform float shininess;
+		varying vec3 N, L, E;
+		varying float d;
+
+		varying  vec2 fTexCoord;
+		
+
+		varying float s, t;
+		uniform sampler2D texture;
+		uniform sampler2D texture0;
+		uniform sampler2D texture1;
+		uniform sampler2D texture2;
+		uniform sampler2D texture3;
+		uniform sampler2D texture4;
+		uniform sampler2D texture5;
+		uniform sampler2D texture6;
+		uniform sampler2D texture7;
+		uniform sampler2D texture8;
+		uniform sampler2D texture9;
+		uniform sampler2D texture10;
+		uniform int bTexCoord;
+		void main()
+		{    
+			vec4 fColor;
+
+			vec3 H = normalize( L + E );
+			vec4 ambient = ambientProduct;
+
+			float Kd = max( dot(L, N), 0.0 );
+			vec4  diffuse = Kd*diffuseProduct;
+
+			float Ks = pow( max(dot(N, H), 0.0), shininess );
+			vec4  specular = Ks * specularProduct;
+
+			if( dot(L, N) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
+
+			fColor = ambient + diffuse +specular;
+			fColor /=d;
+			fColor.a = 1.0;
+			
+			if(bTexCoord==0)gl_FragColor = fColor*texture2D( texture, fTexCoord );
+			else if(bTexCoord==1){
+					fColor =fColor*d;
+					gl_FragColor = fColor*texture2D( texture1, fTexCoord );
+				}
+			else if(bTexCoord==2)gl_FragColor = texture2D( texture2, fTexCoord );
+			else if(bTexCoord==3)gl_FragColor = texture2D( texture3, fTexCoord );
+			else if(bTexCoord==4)gl_FragColor = fColor*texture2D( texture4, fTexCoord );
+			else if(bTexCoord==5)gl_FragColor = fColor*texture2D( texture5, fTexCoord );
+			else if(bTexCoord==6)gl_FragColor = texture2D( texture6, fTexCoord );
+			else if(bTexCoord==7)gl_FragColor = fColor*texture2D( texture7, fTexCoord );
+			else if(bTexCoord==8)gl_FragColor = fColor*texture2D( texture8, fTexCoord );
+			else if(bTexCoord==9)gl_FragColor = fColor*texture2D( texture9, fTexCoord );
+			else if(bTexCoord==10)gl_FragColor = texture2D( texture10, vec2(s, t));
+			else gl_FragColor = fColor*texture2D( texture0, vec2(s, t));
+		}
+	</script>
+
+	
+
+	<img id = "background_N" src = "background_B.jpg" hidden></img>
+	<img id = "background_S" src = "background_S.jpg" hidden></img>
+	<img id = "background_L" src = "background_L.jpg" hidden></img>
+	<img id = "background_R" src = "background_R.jpg" hidden></img>
+	<img id = "background_U" src = "background_U.jpg" hidden></img>
+	<img id = "tree1" src = "tree1.jpg" hidden></img>
+	<img id = "tree2" src = "tree2.jpg" hidden></img>
+	<img id = "cloths" src = "cloth.jpg" hidden></img>	
+	<img id = "sun" src = "sun.jpg" hidden></img>
+	<img id = "background_B" src = "texImageBackGround.jpg" hidden></img>
+	
+	<font size="2">WASD移动，空格进行跳跃</size>
+	<br>
+	<font size="2">c:小人视角;x:世界视角;z:y坐标归零;鼠标左键:小人手部动作</size>
+	<br>
+	<body onMouseDown="playmusic()">
+    <audio id="myaudio" autoplay="autoplay" loop=-1 src="music.mp3" type="audio/mpeg"></audio>
+	<div><canvas id="gl-canvas" width="800" height="800" onMouseDown="enterFullScreen()">"Oops ... your browser doesn't support the HTML5 canvas element"</canvas>
+	</div>
+	</body>
+</html>

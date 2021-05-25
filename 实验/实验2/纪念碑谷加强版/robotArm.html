@@ -1,0 +1,110 @@
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute  vec4 vPosition;
+attribute  vec4 vColor;
+varying vec4 fColor;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+void main()
+{
+    fColor = vColor;
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying  vec4 fColor;
+
+void main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+<script type="text/javascript">
+function Keytest(event)
+{
+	//alert(event.keyCode)
+	if(event.keyCode==32){
+            document.getElementById("legaction").click();
+        }
+	if(event.keyCode==87){
+            document.getElementById("MoveForward").click();
+        }
+	if(event.keyCode==83){
+            document.getElementById("MoveBack").click();
+        }
+	if(event.keyCode==68){
+            document.getElementById("MoveRight").click();
+        }
+	if(event.keyCode==65){
+            document.getElementById("MoveLeft").click();
+        }
+	if(event.keyCode==37){
+            document.getElementById("TurnLeft").click();
+        }
+	if(event.keyCode==39){
+            document.getElementById("TurnRight").click();
+        }
+}
+function mouseDown(event){
+	document.getElementById("Shine").click();
+	//alert(event.keyCode);
+}
+</script>
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="robotArm.js"></script>
+
+<div>
+旋转 -180 <input id="slider1" type="range"
+ min="-180" max="180" step="10" value="0"
+  />
+ 180
+</div><br/>
+
+<div>
+前后平移 <input id="slider2" type="range"
+ min="-180" max="180" step="10" value="0"
+  />
+</div><br/>
+
+<div>
+左右平移 <input id="slider3" type="range"
+ min="-180" max="180" step="10" value="0"
+  />
+</div><br/>
+
+<div>
+上下平移 <input id="slider4" type="range"
+    min="-180" max="180" step="10" value="0"
+    />
+</div><br/>
+
+<button id= "legaction">弯腿动作</button>
+<button id= "MoveRight" style="visibility: hidden"></button>
+<button id= "MoveLeft" style="visibility: hidden"></button>
+<button id= "MoveForward" style="visibility: hidden"></button>
+<button id= "MoveBack" style="visibility: hidden"></button>
+<button id= "TurnLeft" style="visibility: hidden"></button>
+<button id= "TurnRight" style="visibility: hidden"></button>
+<button id= "Shine" style="visibility: hidden"></button>
+<h3>鼠标点击画面产生星光效果✴，再次点击关闭效果</h3>
+<hr>
+<br>
+<font size="2">WASD移动，空格进行跳跃</size>
+<br>
+<font size="2">左右(小键盘的←→)进行视角的旋转</size>
+<br>
+<body onkeyup="Keytest(event)">
+<canvas id="gl-canvas" width="512" height="512" onMouseDown="mouseDown(event)"
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>
